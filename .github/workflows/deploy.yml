@@ -1,4 +1,4 @@
-name: Deploy
+name: Prepare Deploy 
 
 on:
   workflow_dispatch:
@@ -45,13 +45,17 @@ jobs:
 
           cat generated_notes.json | jq -r '.body' > pr_body.txt
 
+      - name: Generate trunkver
+        id: trunkver
+        uses: crftd-tech/trunkver@main
+
       - name: Create Pull Request to main
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          branch_name="release/${{ inputs.commitHash }}"
+          branch_name="release/${{ steps.trunkver.outputs.trunkver }}"
           gh pr create \
-            --title "Deploy: $branch_name" \
+            --title "$branch_name" \
             --body-file pr_body.txt \
-            --base release/main \
+            --base prod \
             --head "$branch_name"
