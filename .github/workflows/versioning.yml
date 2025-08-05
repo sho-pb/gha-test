@@ -23,6 +23,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Checkout commit hash
+        run: git checkout ${{ inputs.commitHash }}
+        if: ${{ inputs.commitHash }}
+
+      - name: Generate trunkver
+        id: trunkver
+        uses: crftd-tech/trunkver@main
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -34,6 +48,7 @@ jobs:
           GITHUB_REPOSITORY: ${{ github.repository }}
           GITHUB_SHA: ${{ github.sha }}
           COMMIT_HASH: ${{ inputs.commitHash }}
+          TRUNKVER: ${{ steps.trunkver.outputs.trunkver }}
           BUILD_ID: ${{ inputs.buildId }}
           IS_DRAFT: ${{ inputs.draft }}
         run: node .github/scripts/versioning.cjs

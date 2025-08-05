@@ -1,21 +1,19 @@
-const { generateTrunkVer } = require('./trunk-ver.cjs');
-
 (async () => {
   const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
   const GITHUB_REPOSITORY = process.env.GITHUB_REPOSITORY;
   const GITHUB_SHA = process.env.GITHUB_SHA;
-  const COMMIT_HASH = process.env.COMMIT_HASH;
-  const BUILD_ID = process.env.BUILD_ID;
+  const COMMIT_HASH =
+    process.env.COMMIT_HASH?.slice(0, 7) ||
+    execSync('git rev-parse --short=7 HEAD');
+  const TRUNKVER = process.env.TRUNKVER;
   const IS_DRAFT = process.env.IS_DRAFT === 'true';
 
   if (!GITHUB_TOKEN || !GITHUB_REPOSITORY || !GITHUB_SHA) process.exit(1);
 
-  const tag = generateTrunkVer(COMMIT_HASH, BUILD_ID);
-
   const payload = {
-    tag_name: tag,
-    name: tag,
-    target_commitish: GITHUB_SHA,
+    tag_name: TRUNKVER,
+    name: TRUNKVER,
+    target_commitish: COMMIT_HASH,
     generate_release_notes: true,
     draft: IS_DRAFT,
     prerelease: false,
