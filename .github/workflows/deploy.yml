@@ -44,7 +44,13 @@ jobs:
             -f target_commitish="$TRIMMED_COMMIT_HASH" \
             > generated_notes.json
 
-          jq -r '.body' generated_notes.json > pr_body.txt
+          jq -r '.body' generated_notes.json > pr_body_raw.txt
+
+          awk '/\* .* in https:\/\/github\.com/ {
+              match($0, /\* .* in (https:\/\/github\.com\/[^\s)]+)/, m);
+              if (m[1] != "") print "* " m[1];
+              next
+            } 1' pr_body_raw.txt > pr_body.txt
 
       - name: Create Pull Request to main
         env:
