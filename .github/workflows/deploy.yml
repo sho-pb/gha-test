@@ -34,12 +34,11 @@ jobs:
         id: release_notes
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO: ${{ github.repository }}
         run: |
           gh api \
             -X POST \
             -H "Accept: application/vnd.github+json" \
-            /repos/$REPO/releases/generate-notes \
+            /repos/${{ github.repository }}/releases/generate-notes \
             -f tag_name="${{ inputs.commitHash }}" \
             -f target_commitish="${{ env.current_sha }}"
           > generated_notes.json
