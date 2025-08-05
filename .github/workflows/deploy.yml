@@ -1,0 +1,30 @@
+name: Deploy
+on:
+  workflow_dispatch:
+    inputs:
+      commitHash:
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  versioning:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get Current Sha
+        run: echo "current_sha=$(git rev-parse HEAD)" >> $GITHUB_ENV
+
+      - name: Checkout commit hash
+        run: git checkout ${{ inputs.commitHash }}
+
+      - name: Create release branch and force push
+        run: |
+          git switch -c release
+          git push origin release --force
