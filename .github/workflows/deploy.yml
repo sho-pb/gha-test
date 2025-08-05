@@ -44,13 +44,17 @@ jobs:
             -f target_commitish="$TRIMMED_COMMIT_HASH" \
             > generated_notes.json
 
+          # 元の release notes 本文を抽出
           jq -r '.body' generated_notes.json > pr_body_raw.txt
 
-          awk '/\* .* in https:\/\/github\.com/ {
-              match($0, /\* .* in (https:\/\/github\.com\/[^\s)]+)/, m);
-              if (m[1] != "") print "* " m[1];
-              next
-            } 1' pr_body_raw.txt > pr_body.txt
+          # 各行に対して "in https://github.com" を検出し、URL のみにする
+          awk '{
+            if (match($0, /\* .* in (https:\/\/github\.com\/[^ )]+)/, m)) {
+              print "* " m[1];
+            } else {
+              print $0;
+            }
+          }' pr_body_raw.txt > pr_body.txt
 
       - name: Create Pull Request to main
         env:
