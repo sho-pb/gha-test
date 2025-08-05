@@ -1,5 +1,3 @@
-const { execSync } = require('child_process');
-
 (async () => {
   const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
   const GITHUB_REPOSITORY = process.env.GITHUB_REPOSITORY;
