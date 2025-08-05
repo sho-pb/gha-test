@@ -1,4 +1,4 @@
-const { generateTrunkVer } = require('./trunk-ver');
+const { generateTrunkVer } = require('./trunk-ver.cjs');
 
 async () => {
   const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
