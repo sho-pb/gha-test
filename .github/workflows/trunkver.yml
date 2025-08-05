@@ -20,14 +20,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout specific commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.commitHash }}
+          fetch-depth: 0
+
       - name: Generate trunkver
         id: trunkver
         uses: crftd-tech/trunkver@main
 
       - name: Print trunkver
-        with:
-          ref: ${{ inputs.commitHash }}
-          fetch-depth: 0
         env:
           TRUNKVER: ${{ steps.trunkver.outputs.trunkver }}
         run: |
