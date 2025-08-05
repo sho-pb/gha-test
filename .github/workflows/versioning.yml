@@ -1,0 +1,31 @@
+name: Create GitHub Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      commitHash:
+        required: false
+      buildId:
+        required: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Run versioning script
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_SHA: ${{ github.sha }}
+          COMMIT_HASH: ${{ inputs.commitHash }}
+          BUILD_ID: ${{ inputs.buildId }}
+        run: node .github/scripts/versioning.cjs
