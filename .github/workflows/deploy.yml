@@ -5,6 +5,9 @@ on:
     inputs:
       commitHash:
         required: true
+      target:
+        required: true
+        default: 'main'
 
 permissions:
   contents: write
@@ -20,11 +23,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Trim commitHash and set env vars
+      - name: Trim and shorten commitHash, set env vars
         run: |
           trimmed=$(echo '${{ inputs.commitHash }}' | xargs)
+          short=${trimmed:0:7}
           echo "TRIMMED_COMMIT_HASH=$trimmed" >> $GITHUB_ENV
-          echo "BRANCH_NAME=deploy/$trimmed" >> $GITHUB_ENV
+          echo "SHORT_COMMIT_HASH=$short" >> $GITHUB_ENV
+          echo "BRANCH_NAME=deploy/$short" >> $GITHUB_ENV
 
       - name: Create deploy branch and push
         run: |
@@ -62,12 +67,12 @@ jobs:
             cat pr_body_processed.txt
           } > pr_body.txt
 
-      - name: Create Pull Request to main
+      - name: Create Pull Request
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh pr create \
             --title "$BRANCH_NAME" \
             --body-file pr_body.txt \
-            --base prod \
+            --base ${{ inputs.target }} \
             --head "$BRANCH_NAME"
