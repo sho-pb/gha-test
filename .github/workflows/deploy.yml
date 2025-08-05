@@ -26,5 +26,5 @@ jobs:
 
       - name: Create release branch and force push
         run: |
-          git switch -c release
-          git push origin release --force
+          git switch -c release/${{ inputs.commitHash }}
+          git push origin release/${{ inputs.commitHash }}
