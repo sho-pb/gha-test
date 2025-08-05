@@ -20,11 +20,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout specific commit
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - run: git checkout ${{ inputs.commitHash }}
+
+      - name: Checkout commit hash
+        run: git checkout ${{ inputs.commitHash }}
         if: ${{ inputs.commitHash }}
 
       - name: Generate trunkver
