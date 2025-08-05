@@ -72,7 +72,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh pr create \
-            --title "$BRANCH_NAME" \
+            --title "deploy: ${{ inputs.commitHash }}" \
             --body-file pr_body.txt \
             --base ${{ inputs.target }} \
             --head "$BRANCH_NAME"
