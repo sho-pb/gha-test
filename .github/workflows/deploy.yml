@@ -25,7 +25,7 @@ jobs:
           git checkout ${{ inputs.commitHash }}
           branch_name="release/${{ inputs.commitHash }}"
           git switch -c "$branch_name"
-          git push origin "$branch_name"
+          git push origin -f "$branch_name"
 
       - name: Get Current Sha
         run: echo "current_sha=$(git rev-parse HEAD)" >> $GITHUB_ENV
@@ -53,5 +53,5 @@ jobs:
           gh pr create \
             --title "Deploy: $branch_name" \
             --body-file pr_body.txt \
-            --base main \
+            --base release/main \
             --head "$branch_name"
