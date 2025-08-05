@@ -1,9 +1,31 @@
-- name: Generate trunkver
-  id: trunkver
-  uses: crftd-tech/trunkver@main
+name: TrunkVer
 
-- name: Print trunkver
-  env:
-    TRUNKVER: ${{ steps.trunkver.outputs.trunkver }}
-  run: |
-    echo "$TRUNKVER"
+on:
+  workflow_dispatch:
+    inputs:
+      commitHash:
+        required: false
+      buildId:
+        required: false
+      draft:
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: write
+
+jobs:
+  versioning:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Generate trunkver
+        id: trunkver
+        uses: crftd-tech/trunkver@main
+
+      - name: Print trunkver
+        env:
+          TRUNKVER: ${{ steps.trunkver.outputs.trunkver }}
+        run: |
+          echo "$TRUNKVER"
