@@ -16,7 +16,7 @@ const formatDate = (date) => {
 
 const generateTrunkVer = (commitHash, buildId) => {
   const hash =
-    commitHash?.slice(0, 7) ??
+    commitHash?.slice(0, 7) ||
     execSync('git rev-parse --short=7 HEAD')
 
   return [
