@@ -20,6 +20,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Get Current Sha
+        run: echo "current_sha=$(git rev-parse HEAD)" >> $GITHUB_ENV
+
       - name: Create release branch and force push
         run: |
           git checkout ${{ inputs.commitHash }}
@@ -31,17 +34,13 @@ jobs:
         id: release_notes
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO: ${{ github.repository }}
-          BASE: main
-          HEAD: release/${{ inputs.commitHash }}
         run: |
           gh api \
             -X POST \
             -H "Accept: application/vnd.github+json" \
             /repos/$REPO/releases/generate-notes \
-            -f tag_name="$HEAD" \
-            -f target_commitish="$HEAD" \
-            -f previous_tag_name="$BASE" \
+            -f tag_name="${{ inputs.commitHash }}" \
+            -f target_commitish="${{ env.current_sha }}"
           > generated_notes.json
 
           cat generated_notes.json | jq -r '.body' > pr_body.txt
