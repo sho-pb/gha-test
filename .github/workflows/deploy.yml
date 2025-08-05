@@ -22,7 +22,6 @@ jobs:
 
       - name: Create release branch and force push
         run: |
-          git fetch origin
           git checkout ${{ inputs.commitHash }}
           branch_name="release/${{ inputs.commitHash }}"
           git switch -c "$branch_name"
