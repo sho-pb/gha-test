@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       commitHash:
-        required: true
+        required: false
       buildId:
         required: false
       draft:
@@ -23,8 +23,9 @@ jobs:
       - name: Checkout specific commit
         uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.commitHash }}
           fetch-depth: 0
+      - run: git checkout ${{ inputs.commitHash }}
+        if: ${{ inputs.commitHash }}
 
       - name: Generate trunkver
         id: trunkver
