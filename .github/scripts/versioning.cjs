@@ -4,9 +4,6 @@ const { execSync } = require('child_process');
   const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
   const GITHUB_REPOSITORY = process.env.GITHUB_REPOSITORY;
   const GITHUB_SHA = process.env.GITHUB_SHA;
-  const COMMIT_HASH =
-    process.env.COMMIT_HASH?.slice(0, 7) ||
-    execSync('git rev-parse --short=7 HEAD').toString();
   const TRUNKVER = process.env.TRUNKVER;
   const IS_DRAFT = process.env.IS_DRAFT === 'true';
 
@@ -15,7 +12,7 @@ const { execSync } = require('child_process');
   const payload = {
     tag_name: TRUNKVER,
     name: TRUNKVER,
-    target_commitish: COMMIT_HASH,
+    target_commitish: 'main',
     generate_release_notes: true,
     draft: IS_DRAFT,
     prerelease: false,
