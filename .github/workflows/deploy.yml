@@ -76,3 +76,10 @@ jobs:
             --body-file pr_body.txt \
             --base ${{ inputs.target }} \
             --head "$BRANCH_NAME"
+
+      - name: Add 'release' label to PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_URL=$(gh pr view "$BRANCH_NAME" --json url -q .url)
+          gh pr edit "$PR_URL" --add-label "release"
