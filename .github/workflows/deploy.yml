@@ -20,10 +20,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Create release branch and push
+      - name: Create deploy branch and push
         run: |
           git checkout ${{ inputs.commitHash }}
-          branch_name="release/${{ inputs.commitHash }}"
+          branch_name="deploy/${{ inputs.commitHash }}"
           git switch -c "$branch_name"
           git push origin -f "$branch_name"
 
@@ -49,7 +49,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          branch_name="release/${{ inputs.commitHash }}"
+          branch_name="deploy/${{ inputs.commitHash }}"
           gh pr create \
             --title "$branch_name" \
             --body-file pr_body.txt \
