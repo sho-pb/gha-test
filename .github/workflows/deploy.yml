@@ -20,15 +20,18 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Create release branch and push
+      - name: Generate trunkver
+        id: trunkver
+        uses: crftd-tech/trunkver@main
+
+      - name: Checkout commit and create release branch
         run: |
+          git fetch origin
           git checkout ${{ inputs.commitHash }}
-          branch_name="release/${{ inputs.commitHash }}"
+          branch_name="release/${{ steps.trunkver.outputs.trunkver }}"
+          echo "branch_name=$branch_name" >> $GITHUB_ENV
           git switch -c "$branch_name"
           git push origin -f "$branch_name"
-
-      - name: Get Current Sha
-        run: echo "current_sha=$(git rev-parse HEAD)" >> $GITHUB_ENV
 
       - name: Generate release notes using GitHub API
         id: release_notes
@@ -39,23 +42,18 @@ jobs:
             -X POST \
             -H "Accept: application/vnd.github+json" \
             /repos/${{ github.repository }}/releases/generate-notes \
-            -f tag_name="${{ inputs.commitHash }}" \
-            -f target_commitish="${{ env.current_sha }}"
+            -f tag_name="${{ steps.trunkver.outputs.trunkver }}" \
+            -f target_commitish="release/${{ steps.trunkver.outputs.trunkver }}" \
           > generated_notes.json
 
-          cat generated_notes.json | jq -r '.body' > pr_body.txt
+          jq -r '.body' generated_notes.json > pr_body.txt
 
-      - name: Generate trunkver
-        id: trunkver
-        uses: crftd-tech/trunkver@main
-
-      - name: Create Pull Request to main
+      - name: Create Pull Request to prod
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          branch_name="release/${{ steps.trunkver.outputs.trunkver }}"
           gh pr create \
-            --title "$branch_name" \
+            --title "release/${{ steps.trunkver.outputs.trunkver }}" \
             --body-file pr_body.txt \
             --base prod \
-            --head "$branch_name"
+            --head "release/${{ steps.trunkver.outputs.trunkver }}"
