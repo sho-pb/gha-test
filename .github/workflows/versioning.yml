@@ -7,6 +7,10 @@ on:
         required: false
       buildId:
         required: false
+      draft:
+        required: false
+        default: true
+        type: boolean
 
 permissions:
   contents: write
@@ -31,4 +35,5 @@ jobs:
           GITHUB_SHA: ${{ github.sha }}
           COMMIT_HASH: ${{ inputs.commitHash }}
           BUILD_ID: ${{ inputs.buildId }}
+          IS_DRAFT: ${{ inputs.draft }}
         run: node .github/scripts/versioning.cjs

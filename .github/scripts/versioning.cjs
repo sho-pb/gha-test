@@ -6,6 +6,7 @@ const { generateTrunkVer } = require('./trunk-ver.cjs');
   const GITHUB_SHA = process.env.GITHUB_SHA;
   const COMMIT_HASH = process.env.COMMIT_HASH;
   const BUILD_ID = process.env.BUILD_ID;
+  const IS_DRAFT = process.env.IS_DRAFT === 'true';
 
   if (!GITHUB_TOKEN || !GITHUB_REPOSITORY || !GITHUB_SHA) process.exit(1);
 
@@ -16,7 +17,7 @@ const { generateTrunkVer } = require('./trunk-ver.cjs');
     name: tag,
     target_commitish: GITHUB_SHA,
     generate_release_notes: true,
-    draft: false,
+    draft: IS_DRAFT,
     prerelease: false,
   };
 
