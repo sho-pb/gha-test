@@ -25,6 +25,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Get Current Sha
+        run: echo "current_sha=$(git rev-parse HEAD)" >> $GITHUB_ENV
+
       - name: Checkout commit hash
         run: git checkout ${{ inputs.commitHash }}
         if: ${{ inputs.commitHash }}
@@ -42,7 +45,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_SHA: ${{ env.current_sha }}
           COMMIT_HASH: ${{ inputs.commitHash }}
           TRUNKVER: ${{ steps.trunkver.outputs.trunkver }}
           BUILD_ID: ${{ inputs.buildId }}
