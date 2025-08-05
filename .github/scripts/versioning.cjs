@@ -1,6 +1,6 @@
 const { generateTrunkVer } = require('./trunk-ver.cjs');
 
-async () => {
+(async () => {
   const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
   const GITHUB_REPOSITORY = process.env.GITHUB_REPOSITORY;
   const GITHUB_SHA = process.env.GITHUB_SHA;
@@ -39,4 +39,4 @@ async () => {
     console.error(errorText);
     process.exit(1);
   }
-};
+})();
