@@ -6,7 +6,7 @@ const { execSync } = require('child_process');
   const GITHUB_SHA = process.env.GITHUB_SHA;
   const COMMIT_HASH =
     process.env.COMMIT_HASH?.slice(0, 7) ||
-    execSync('git rev-parse --short=7 HEAD');
+    execSync('git rev-parse --short=7 HEAD').toString();
   const TRUNKVER = process.env.TRUNKVER;
   const IS_DRAFT = process.env.IS_DRAFT === 'true';
 
