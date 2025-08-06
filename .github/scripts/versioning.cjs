@@ -3,7 +3,6 @@
   const GITHUB_REPOSITORY = process.env.GITHUB_REPOSITORY;
   const GITHUB_SHA = process.env.GITHUB_SHA;
   const TRUNKVER = process.env.TRUNKVER;
-  const IS_DRAFT = process.env.IS_DRAFT === 'true';
 
   if (!GITHUB_TOKEN || !GITHUB_REPOSITORY || !GITHUB_SHA) process.exit(1);
 
@@ -12,7 +11,7 @@
     name: TRUNKVER,
     target_commitish: GITHUB_SHA,
     generate_release_notes: true,
-    draft: IS_DRAFT,
+    draft: false,
     prerelease: false,
   };
 

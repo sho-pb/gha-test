@@ -1,10 +1,13 @@
-name: Prepare Deploy 
+name: Prepare Deploy
 
 on:
   workflow_dispatch:
     inputs:
       commitHash:
+        required: false
+      target:
         required: true
+        default: 'main'
 
 permissions:
   contents: write
@@ -20,15 +23,22 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Create release branch and push
+      - name: Trim and shorten commitHash, set env vars
         run: |
-          git checkout ${{ inputs.commitHash }}
-          branch_name="release/${{ inputs.commitHash }}"
-          git switch -c "$branch_name"
-          git push origin -f "$branch_name"
+          if [ -z "${{ inputs.commitHash }}" ]; then
+            trimmed=$(git rev-parse HEAD)
+          else
+            trimmed=$(echo '${{ inputs.commitHash }}' | xargs)
+          fi
+          short=${trimmed:0:7}
+          echo "TRIMMED_COMMIT_HASH=$trimmed" >> $GITHUB_ENV
+          echo "SHORT_COMMIT_HASH=$short" >> $GITHUB_ENV
+          echo "BRANCH_NAME=deploy/$short" >> $GITHUB_ENV
 
-      - name: Get Current Sha
-        run: echo "current_sha=$(git rev-parse HEAD)" >> $GITHUB_ENV
+      - name: Create deploy branch and push
+        run: |
+          git switch --create "$BRANCH_NAME" "$TRIMMED_COMMIT_HASH"
+          git push origin -f "$BRANCH_NAME"
 
       - name: Generate release notes using GitHub API
         id: release_notes
@@ -39,23 +49,41 @@ jobs:
             -X POST \
             -H "Accept: application/vnd.github+json" \
             /repos/${{ github.repository }}/releases/generate-notes \
-            -f tag_name="${{ inputs.commitHash }}" \
-            -f target_commitish="${{ env.current_sha }}"
-          > generated_notes.json
+            -f tag_name="$TRIMMED_COMMIT_HASH" \
+            -f target_commitish="$TRIMMED_COMMIT_HASH" \
+            > generated_notes.json
 
-          cat generated_notes.json | jq -r '.body' > pr_body.txt
+          jq -r '.body' generated_notes.json > pr_body_raw.txt
 
-      - name: Generate trunkver
-        id: trunkver
-        uses: crftd-tech/trunkver@main
+          awk '{
+            if (match($0, /\* .* in (https:\/\/github\.com\/[^ )]+)/, m)) {
+              print "* " m[1];
+            } else {
+              print $0;
+            }
+          }' pr_body_raw.txt > pr_body_processed.txt
 
-      - name: Create Pull Request to main
+          {
+            echo '## デプロイ手順書'
+            echo ''
+            echo '- <https://github.com>'
+            echo ''
+            cat pr_body_processed.txt
+          } > pr_body.txt
+
+      - name: Create Pull Request
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          branch_name="release/${{ steps.trunkver.outputs.trunkver }}"
           gh pr create \
-            --title "$branch_name" \
+            --title "deploy: $SHORT_COMMIT_HASH" \
             --body-file pr_body.txt \
-            --base prod \
-            --head "$branch_name"
+            --base ${{ inputs.target }} \
+            --head "$BRANCH_NAME"
+
+      - name: Add 'release' label to PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_URL=$(gh pr view "$BRANCH_NAME" --json url -q .url)
+          gh pr edit "$PR_URL" --add-label "release"
