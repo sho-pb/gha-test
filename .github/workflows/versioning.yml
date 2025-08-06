@@ -1,16 +1,9 @@
 name: Versioning
 
 on:
-  workflow_dispatch:
-    inputs:
-      commitHash:
-        required: false
-      buildId:
-        required: false
-      draft:
-        required: false
-        default: true
-        type: boolean
+  push:
+    branches:
+      - prod
 
 permissions:
   contents: write
@@ -28,10 +21,6 @@ jobs:
       - name: Get Current Sha
         run: echo "current_sha=$(git rev-parse HEAD)" >> $GITHUB_ENV
 
-      - name: Checkout commit hash
-        run: git checkout ${{ inputs.commitHash }}
-        if: ${{ inputs.commitHash }}
-
       - name: Generate trunkver
         id: trunkver
         uses: crftd-tech/trunkver@main
@@ -46,8 +35,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           GITHUB_SHA: ${{ env.current_sha }}
-          COMMIT_HASH: ${{ inputs.commitHash }}
           TRUNKVER: ${{ steps.trunkver.outputs.trunkver }}
-          BUILD_ID: ${{ inputs.buildId }}
-          IS_DRAFT: ${{ inputs.draft }}
         run: node .github/scripts/versioning.cjs
