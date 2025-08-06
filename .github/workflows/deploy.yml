@@ -76,7 +76,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh pr create \
-            --title "deploy: ${{ inputs.commitHash }}" \
+            --title "deploy: $SHORT_COMMIT_HASH" \
             --body-file pr_body.txt \
             --base ${{ inputs.target }} \
             --head "$BRANCH_NAME"
