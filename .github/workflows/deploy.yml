@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       commitHash:
-        required: true
+        required: false
       target:
         required: true
         default: 'main'
@@ -25,7 +25,11 @@ jobs:
 
       - name: Trim and shorten commitHash, set env vars
         run: |
-          trimmed=$(echo '${{ inputs.commitHash }}' | xargs)
+          if [ -z "${{ inputs.commitHash }}" ]; then
+            trimmed=$(git rev-parse HEAD)
+          else
+            trimmed=$(echo '${{ inputs.commitHash }}' | xargs)
+          fi
           short=${trimmed:0:7}
           echo "TRIMMED_COMMIT_HASH=$trimmed" >> $GITHUB_ENV
           echo "SHORT_COMMIT_HASH=$short" >> $GITHUB_ENV
