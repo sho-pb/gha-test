@@ -9,7 +9,7 @@
   const payload = {
     tag_name: TRUNKVER,
     name: TRUNKVER,
-    target_commitish: GITHUB_SHA,
+    target_commitish: 'prod',
     generate_release_notes: true,
     draft: false,
     prerelease: false,
