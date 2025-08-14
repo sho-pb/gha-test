@@ -21,6 +21,7 @@ jobs:
       - name: Get Current Sha
         run: |
           if git rev-parse HEAD^2 >/dev/null 2>&1; then
+            echo "this is merge commit!"
             echo "current_sha=$(git rev-parse HEAD^2)" >> $GITHUB_ENV
           else
             echo "current_sha=$(git rev-parse HEAD)" >> $GITHUB_ENV
