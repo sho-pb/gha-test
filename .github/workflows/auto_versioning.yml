@@ -3,7 +3,7 @@ name: Auto Versioning
 on:
   push:
     branches:
-      - main
+      - prod
 
 permissions:
   contents: write
